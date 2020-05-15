@@ -8,9 +8,9 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,11 +18,13 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-
+    private static final String TAG = MainActivity.class.getSimpleName();
     private BaseAdapter listContentAdapter;
     public SharedPreferences sharedPref;
     public static String NOTE_TEXT = "note_text";
     private List<Map<String, String>> values = new ArrayList<>();
+    private ArrayList<Integer> index = new ArrayList<>();
+
 
 
     public List<Map<String, String>> prepareContent() {
@@ -44,6 +46,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ListView listView = findViewById(R.id.list);
         final SwipeRefreshLayout swipeLayout = findViewById(R.id.swipeRefresh);
+        savedInstanceState.putIntegerArrayList(TAG,index);
+        index = new ArrayList<>();
+
+
+        sharedPref = getSharedPreferences("MyNote", MODE_PRIVATE);
+        if (!sharedPref.contains(NOTE_TEXT)) {
+            sharedPref.edit().putString(NOTE_TEXT, getString(R.string.large_text)).apply();
+        }
 
         String[] from = {"left", "right"};
         int[] to = {R.id.left_text, R.id.right_text};
@@ -52,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 values.remove(0);
+                index.add(values.indexOf(0));
+                //values.remove(index.intValue());
                 listContentAdapter.notifyDataSetChanged();
             }
         });
@@ -65,12 +77,20 @@ public class MainActivity extends AppCompatActivity {
                 prepareContent();
                 listContentAdapter.notifyDataSetChanged();
                 swipeLayout.setRefreshing(false);
+
             }
         });
-
-        sharedPref = getSharedPreferences("MyNote", MODE_PRIVATE);
-        if (sharedPref.getString(NOTE_TEXT, null) == null) {
-            sharedPref.edit().putString(NOTE_TEXT, getString(R.string.large_text)).apply();
-        }
     }
+
+   /* @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putIntegerArrayList(TAG,index);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        savedInstanceState.getIntegerArrayList(TAG);
+    }*/
 }
