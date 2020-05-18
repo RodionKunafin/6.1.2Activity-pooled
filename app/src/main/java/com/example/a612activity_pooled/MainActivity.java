@@ -28,9 +28,10 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
     public List<Map<String, String>> prepareContent() {
         sharedPref = getSharedPreferences("MyNote", MODE_PRIVATE);
-        List<String> strings = new ArrayList<>(Arrays.asList(sharedPref.getString(NOTE_TEXT, null).split("\n")));
+        List<String> strings = new ArrayList<>(Arrays.asList(sharedPref.getString(NOTE_TEXT, "").split("\n")));
         for (int currentIndex : index) {
             strings.remove(currentIndex);
         }
